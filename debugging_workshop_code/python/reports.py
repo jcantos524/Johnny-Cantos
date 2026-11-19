@@ -1,6 +1,9 @@
 def find_product_by_name(products, name):
+    if not isinstance(name, str):
+        return None
+    search_name = name.strip().lower()
     for product in products:
-        if product["name"].lower() == name.lower():
+        if product["name"].lower() == search_name:
             return product
     return None
 
@@ -11,6 +14,7 @@ def low_stock_products(products, threshold=5):
 
 def products_sorted_by_price(products):
     return sorted(products, key=lambda p: p["price"])
+
 
 
 def category_summary(products):
