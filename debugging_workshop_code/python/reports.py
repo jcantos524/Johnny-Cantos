@@ -1,4 +1,7 @@
 def find_product_by_name(products, name):
+    if not isinstance(name, str):
+        return None
+
     for product in products:
         if product["name"].lower() == name:
             return product
