@@ -20,6 +20,8 @@ def calculate_subtotal(order, products):
 #Added parentheses to discounted_subtotal in tax calculation for correct order of operations.
 
 def calculate_tax(customer, discounted_subtotal, tax_rates):
+    if customer is None:
+        return 0
     state = customer.get("state", "NJ")
     rate = tax_rates.get(state, 0.07)
     return round((discounted_subtotal * rate), 2)
@@ -34,7 +36,7 @@ def calculate_shipping(discounted_subtotal):
 def process_order(order, products, customers, tax_rates):
     customer = find_customer_by_id(customers, order.get("customer_id"))
 
-    errors = validate_order(order, products, customers)
+    errors = validate_order(order, products, customers) 
 
     subtotal = calculate_subtotal(order, products)
     discounts = apply_discounts(order, customer, products, subtotal)
@@ -43,7 +45,8 @@ def process_order(order, products, customers, tax_rates):
 
     total = discounts["discounted_subtotal"] + tax + shipping
 
-    reserve_inventory(products, order)
+    if len(errors) ==0:
+        reserve_inventory(products, order)
 
     return {
         "order_id": order["id"],
