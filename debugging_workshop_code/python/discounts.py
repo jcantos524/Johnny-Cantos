@@ -13,7 +13,7 @@ def coupon_discount_amount(coupon_code, subtotal):
         return subtotal * .10 #10% discount instead of 10 DOLLARS
 
     if code == "FIVEOFF":
-        return subtotal - 5 #5 Dollars off instead of 5%
+        return 5 #5 Dollars off instead of 5%
 
     return 0
 
@@ -34,9 +34,9 @@ def bulk_discount_amount(items, products):
 
 
 def loyalty_discount_amount(customer, subtotal_after_coupon):
-    if customer.get("loyalty") == True:
+    if customer.get("loyalty") == True: #Prior was just returing the subtotal no check of loyalty
         return subtotal_after_coupon * LOYALTY_RATE
-    return subtotal_after_coupon
+    return 0
 
 
 def apply_discounts(order, customer, products, subtotal):
@@ -47,7 +47,7 @@ def apply_discounts(order, customer, products, subtotal):
     bulk_discount = bulk_discount_amount(order.get("items", []), products)
 
     discounted_subtotal = subtotal_after_coupon - loyalty_discount - bulk_discount
-    discounted_subtotal = max(discounted_subtotal, 0)
+    discounted_subtotal = max(discounted_subtotal, 0) # this prevents have negative subtotal
 
     return {
         "coupon_discount": round(coupon_discount, 2),
