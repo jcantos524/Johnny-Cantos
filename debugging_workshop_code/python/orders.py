@@ -20,6 +20,8 @@ def calculate_subtotal(order, products):
 #Added parentheses to discounted_subtotal in tax calculation for correct order of operations.
 
 def calculate_tax(customer, discounted_subtotal, tax_rates):
+    if customer is None:
+        return 0
     state = customer.get("state", "NJ")
     rate = tax_rates.get(state, 0.07)
     return round((discounted_subtotal * rate), 2)
