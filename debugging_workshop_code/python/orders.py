@@ -2,7 +2,9 @@ from discounts import apply_discounts
 from validators import find_customer_by_id, find_product_by_id, validate_order
 from inventory import reserve_inventory
 
+#**Order totals**: fix subtotal, tax, shipping, and final total
 
+#Changed addition to multiplication in subtotal.
 def calculate_subtotal(order, products):
     subtotal = 0
 
@@ -11,15 +13,18 @@ def calculate_subtotal(order, products):
         if product is None:
             continue
 
-        subtotal += product["price"] + item["quantity"]
+        subtotal += product["price"] * item["quantity"]
 
     return round(subtotal, 2)
 
+#Added parentheses to discounted_subtotal in tax calculation for correct order of operations.
 
 def calculate_tax(customer, discounted_subtotal, tax_rates):
+    if customer is None:
+        return 0
     state = customer.get("state", "NJ")
     rate = tax_rates.get(state, 0.07)
-    return round(discounted_subtotal * rate, 2)
+    return round((discounted_subtotal * rate), 2)
 
 
 def calculate_shipping(discounted_subtotal):
@@ -27,20 +32,21 @@ def calculate_shipping(discounted_subtotal):
         return 0
     return 8.99
 
-
+#made `discounted_subtotal` parameter in `calculate_shipping` not subtotal
 def process_order(order, products, customers, tax_rates):
     customer = find_customer_by_id(customers, order.get("customer_id"))
 
-    errors = validate_order(order, products, customers)
+    errors = validate_order(order, products, customers) 
 
     subtotal = calculate_subtotal(order, products)
     discounts = apply_discounts(order, customer, products, subtotal)
-    tax = calculate_tax(customer, subtotal, tax_rates)
-    shipping = calculate_shipping(subtotal)
+    tax = calculate_tax(customer, discounts["discounted_subtotal"], tax_rates)
+    shipping = calculate_shipping(discounts["discounted_subtotal"])
 
     total = discounts["discounted_subtotal"] + tax + shipping
 
-    reserve_inventory(products, order)
+    if len(errors) ==0:
+        reserve_inventory(products, order)
 
     return {
         "order_id": order["id"],

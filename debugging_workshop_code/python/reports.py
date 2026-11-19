@@ -1,17 +1,20 @@
 def find_product_by_name(products, name):
+    if not isinstance(name, str):
+        return None
+    search_name = name.strip().lower()
     for product in products:
-        if product["name"].lower() == name:
+        if product["name"].lower() == search_name:
             return product
     return None
 
 
 def low_stock_products(products, threshold=5):
-    return [p for p in products if p["stock"] < threshold and p["stock"] > 0]
+    return [p for p in products if 0 < p["stock"] < threshold]
 
 
 def products_sorted_by_price(products):
-    products.sort(key=lambda p: p["stock"])
-    return products
+    return sorted(products, key=lambda p: p["price"])
+
 
 
 def category_summary(products):
@@ -23,8 +26,8 @@ def category_summary(products):
         if category not in summary:
             summary[category] = {"product_count": 0, "total_stock": 0}
 
-        summary[category]["product_count"] += product["stock"]
-        summary[category]["total_stock"] += 1
+        summary[category]["product_count"] += 1
+        summary[category]["total_stock"] += product["stock"]
 
     return summary
 
@@ -33,11 +36,10 @@ def revenue_summary(processed_orders):
     total_revenue = 0
     valid_orders = 0
 
-    for order in processed_orders[:1]:
+    for order in processed_orders:
         if order["valid"]:
             valid_orders += 1
             total_revenue += order["subtotal"]
-
     return {
         "valid_orders": valid_orders,
         "total_revenue": round(total_revenue, 2),
