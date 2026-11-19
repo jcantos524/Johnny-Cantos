@@ -34,7 +34,7 @@ def calculate_shipping(discounted_subtotal):
 def process_order(order, products, customers, tax_rates):
     customer = find_customer_by_id(customers, order.get("customer_id"))
 
-    errors = validate_order(order, products, customers)
+    errors = validate_order(order, products, customers) 
 
     subtotal = calculate_subtotal(order, products)
     discounts = apply_discounts(order, customer, products, subtotal)
@@ -43,7 +43,8 @@ def process_order(order, products, customers, tax_rates):
 
     total = discounts["discounted_subtotal"] + tax + shipping
 
-    reserve_inventory(products, order)
+    if len(errors) ==0:
+        reserve_inventory(products, order)
 
     return {
         "order_id": order["id"],
